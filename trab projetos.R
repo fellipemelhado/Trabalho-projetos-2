@@ -231,7 +231,8 @@ ggplot(dfpc, aes(x = '', y = numero, fill = bandeiras)) + geom_bar(width = 1, st
 
 tabl1 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                             # Summary by group using dplyr
   group_by(sigla) %>% 
-  summarize(min = min(preco),
+  summarize(n = n(),
+            min = min(preco),
             mediana = median(preco),
             media = mean(preco),
             max = max(preco),
@@ -242,7 +243,8 @@ kable(tabl1, format = 'latex', align = 'lcccccc')
 
 tabl2 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                              # Summary by group using dplyr
   group_by(band) %>% 
-  summarize(min = min(preco),
+  summarize(n = n(),
+            min = min(preco),
             mediana = median(preco),
             media = mean(preco),
             max = max(preco),
@@ -252,7 +254,8 @@ kable(tabl2, format = 'latex', align = 'lcccccc')
 
 tabl3 = df   %>%  filter(ano == 2019) %>%                    # Summary by group using dplyr
   group_by(produto) %>% 
-  summarize(min = min(preco),
+  summarize(n = n(),
+            min = min(preco),
             mediana = median(preco),
             media = mean(preco),
             max = max(preco),
@@ -262,7 +265,8 @@ kable(tabl3, format = 'latex', align = 'lcccccc')
 
 tabl4 = df   %>%  filter(ano == 2019) %>%                    # Summary by group using dplyr
   group_by(regiao) %>% 
-  summarize(min = min(preco),
+  summarize(n = n(),
+            min = min(preco),
             mediana = median(preco),
             media = mean(preco),
             max = max(preco),
