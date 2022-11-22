@@ -51,12 +51,12 @@ capitais = c("1100205","1302603","1200401","5002704","1600303","5300108","140010
     #Nao tinha como importar o codigo das capitais usando o geobr
 
 #Dummies importantes para fazer regressao dps
-df$dummyb = ifelse(df$bandeira_revenda %in% bandeiras, 1, 0) # importante para uma futura regressao
+df$dummyb = ifelse(df$bandeira_revenda %in% bandd, 1, 0) # importante para uma futura regressao
 df$dummyc = ifelse(df$id_municipio %in% capitais, 1, 0) 
 
 #Renomendoando as colunas e criando uma coluna resumindo os tipos de bandeiras
 colnames(df) = c('ano', 'sigla', 'id', 'bairro', 'bandeira', 'data_coleta', 'produto', 'unidade', 'compra', 'preco', 'dummyb', 'capital')
-df$band = ifelse(df$bandeira %in% bandd, df$bandeira, 'Bandeiras Menores')
+df$band = ifelse(df$bandeira %in% bandeiras, df$bandeira, 'Bandeiras Menores')
 
 #Lendo e criando uma dataframe com informacoes dos estados e regioes do brazil
 regiao = read_state(year = 2019, showProgress = F, simplified = T) %>% dplyr::select(abbrev_state, name_region) %>% 
@@ -118,6 +118,14 @@ graphhp(dfe, 'do entalo')
 graphhp(dfg, 'da gasolina')
 graphhp(dfglp, 'dp glp')
 graphhp(dfgnv, 'dp gnv')
+
+dfph1 = filter(df, produto != 'glp')
+dfph1 = aggregate(dfph1, preco ~ produto + ano, FUN = mean)
+ggplot(dfph1, aes(x = ano, y = preco, color = produto)) + geom_line() + ggtitle('Histórico dos precos', subtitle = 'Fonte: Agência Nacional do Petróleo, Gás Natural e Biocombustíveis') +
+  theme(plot.title = element_text(face = 'bold'),legend.title = element_text(face = 'bold',),
+        legend.text = ggtext::element_markdown(), legend.key.height = unit(2, 'cm')) + xlab('Data') + ylab('Preco R$') +
+  scale_color_discrete(name = 'Tipo de produto')
+
 
 
 #Graficos do Mapa do brasil
@@ -192,7 +200,7 @@ ggplot(dfpc2, aes(x = '', y = numero, fill = produto)) + geom_bar(width = 1, sta
                                    axis.text = element_blank(),axis.ticks = element_blank(),axis.title = element_blank(), panel.grid = element_blank())
 
 
-#######################################################
+ #######################################################
 # Preco historico bandeira com todas
 dfphb = filter(df, produto != 'glp') %>% aggregate(preco ~ band + ano, FUN = mean)
 
@@ -242,7 +250,7 @@ tabl1 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%
             max = max(preco),
             devpd = sd(preco),
             var = var(preco)) %>% rename(UF = sigla)
-kable(tabl1, format = 'latex', align = 'lcccccc')
+kable(tabl1,format = 'latex',  align = 'lcccccc')
 
 
 tabl2 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                              
