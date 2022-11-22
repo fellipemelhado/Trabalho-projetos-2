@@ -40,7 +40,9 @@ df = sample_n(df, 500000)
 
 #Criando vetores para fazer novas colunas dps
 bandeiras = c('IPIRANGA', 'PETROBRAS DISTRIBUIDORA S.A.', 
-              'ALE COMBUSTÍVEIS', 'BRANCA')
+              'ALE COMBUSTÍVEIS', 'BRANCA', 'SHELL')
+bandd = c('IPIRANGA', 'PETROBRAS DISTRIBUIDORA S.A.', 
+              'ALE COMBUSTÍVEIS', 'SHELL')
 diesel = c('diesel s10', 'diesel s50')
 etanol = 'etanol'
 gasolina = c('gasolina', 'gasolina aditivada')
@@ -54,7 +56,7 @@ df$dummyc = ifelse(df$id_municipio %in% capitais, 1, 0)
 
 #Renomendoando as colunas e criando uma coluna resumindo os tipos de bandeiras
 colnames(df) = c('ano', 'sigla', 'id', 'bairro', 'bandeira', 'data_coleta', 'produto', 'unidade', 'compra', 'preco', 'dummyb', 'capital')
-df$band = ifelse(df$bandeira %in% bandeiras, df$bandeira, 'Bandeiras Menores')
+df$band = ifelse(df$bandeira %in% bandd, df$bandeira, 'Bandeiras Menores')
 
 #Lendo e criando uma dataframe com informacoes dos estados e regioes do brazil
 regiao = read_state(year = 2019, showProgress = F, simplified = T) %>% dplyr::select(abbrev_state, name_region) %>% 
@@ -74,12 +76,14 @@ df = mutate(df, sigla = as.character(sigla), id = as.numeric(id),
 #Merge da maneira mais pesada, porem mais pratica
 df = left_join(df, estados, by = 'sigla')
 
+
 #usando data table, se nao rodar usando o left join usar como data frame
 #estados <- data.table(estados, key = "sigla")
 #df <- data.table(df, key = "sigla")
 #df = as.data.frame(merge(df, estados))
 
-
+#
+stargazer::stargazer(as.data.frame(df), type = 'text')
 #mini bases referente a cada tipo de produto
 dfd = filter(df, produto == 'diesel')
 dfds = filter(df, produto %in% diesel)
@@ -229,7 +233,7 @@ ggplot(dfpc, aes(x = '', y = numero, fill = bandeiras)) + geom_bar(width = 1, st
 
 #Fazer tabelinhasc
 
-tabl1 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                             # Summary by group using dplyr
+tabl1 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                             
   group_by(sigla) %>% 
   summarize(n = n(),
             min = min(preco),
@@ -241,7 +245,7 @@ tabl1 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%               
 kable(tabl1, format = 'latex', align = 'lcccccc')
 
 
-tabl2 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                              # Summary by group using dplyr
+tabl2 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%                              
   group_by(band) %>% 
   summarize(n = n(),
             min = min(preco),
@@ -252,7 +256,7 @@ tabl2 = filter(df, produto != 'glp') %>%  filter(ano == 2019) %>%               
             var = var(preco)) %>% rename(Bandeira = band)
 kable(tabl2, format = 'latex', align = 'lcccccc')
 
-tabl3 = df   %>%  filter(ano == 2019) %>%                    # Summary by group using dplyr
+tabl3 = df   %>%  filter(ano == 2019) %>%                   
   group_by(produto) %>% 
   summarize(n = n(),
             min = min(preco),
@@ -263,7 +267,7 @@ tabl3 = df   %>%  filter(ano == 2019) %>%                    # Summary by group 
             var = var(preco)) %>% rename(Produto = produto)
 kable(tabl3, format = 'latex', align = 'lcccccc')
 
-tabl4 = df   %>%  filter(ano == 2019) %>%                    # Summary by group using dplyr
+tabl4 = filter(df, produto != 'glp')   %>%  filter(ano == 2019) %>%                    # Summary by group using dplyr
   group_by(regiao) %>% 
   summarize(n = n(),
             min = min(preco),
